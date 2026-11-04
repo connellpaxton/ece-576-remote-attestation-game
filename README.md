@@ -2,7 +2,7 @@
 
 A demo following the tutorial is available here:
 
-[![asciicast](https://asciinema.org/a/bJMOlPe5F4mFLY0Rl6fiJSOp3.svg)](https://asciinema.org/a/bJMOlPe5F4mFLY0Rl6fiJSOp3)
+[![asciicast](https://asciinema.org/a/McmbiSAs31QO4EIX.svg)](https://asciinema.org/a/McmbiSAs31QO4EIX)
 
 As long as you have git and docker with compose, you should be able to follow along.
 
