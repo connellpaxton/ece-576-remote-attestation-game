@@ -1,5 +1,12 @@
 # Meridian CleanRoom
 
+A demo following the tutorial is available here:
+
+[![asciicast](https://asciinema.org/a/bJMOlPe5F4mFLY0Rl6fiJSOp3.svg)](https://asciinema.org/a/bJMOlPe5F4mFLY0Rl6fiJSOp3)
+
+As long as you have git and docker with compose, you should be able to follow along.
+
+
 Welcome to the Meridian CleanRoom, a simulated Trusted Execution Environment (TEE) that protects sensitive medical data through attestation.
 
 In this excercise, you will learn about the basic components and properties of attestation by verifying yourself with the server.
