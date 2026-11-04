@@ -1,11 +1,12 @@
 services:
   site:
-    image: ghcr.io/tinacheng2/meridian-cleanroom-site:v1
+    build:
+      context: ./priv/private_ece_576_group_project
+      dockerfile: site/Dockerfile
     environment:
-      GITHUB_USERNAME: ${GITHUB_USERNAME:?Set GitHub username first}
       FLAG_SECRET: classroom-demo-v1
     ports:
-      - "127.0.0.1:8080:8080"
+      - "127.0.0.1:${SITE_PORT:-8080}:8080"
 
   player:
     build: ./player

@@ -1,10 +1,11 @@
-# Meridian CleanRoom — Attestation Security Lab
+# Meridian CleanRoom
 
-Welcome to the Meridian CleanRoom cybersecurity lab!
+Welcome to the Meridian CleanRoom, a simulated Trusted Execution Environment (TEE) that protects sensitive medical data through attestation.
 
-In this lab, you will investigate a simulated Trusted Execution Environment (TEE) that protects sensitive medical data through attestation.
-
-Your goal is to explore the system, identify security weaknesses, and capture flags.
+In this excercise, you will learn about the basic components and properties of attestation by verifying yourself with the server.
+In each stage you will attest, using insecurities you observe in the server to receive approval whether it should be granted or not.
+After gaining access to the system, you will receive a flag to show successful completetion, but for full credit in the rubric, you
+must also fully explain how you got to your solution, and provide a fix that will close the security hole.
 
 ## Prerequisites
 
@@ -12,9 +13,9 @@ Before starting, install:
 
 - [Docker Desktop](https://www.docker.com/products/docker-desktop/)
 - [Git](https://git-scm.com/downloads)
-- [GitHub CLI](https://cli.github.com/)
 
-You will also need a GitHub account.
+The docker container packages all of the other dependencies in the project and ensures a uniform starting point for all players.
+
 
 ## Getting Started
 
@@ -25,63 +26,41 @@ git clone https://github.com/tinacheng2/meridian-cleanroom-lab.git
 cd meridian-cleanroom-lab
 ```
 
-### 2. Log In to GitHub
+### 2. Start Docker
 
+Build and start the local containers; this may take a few minutes the first time.
 ```bash
-gh auth login
-```
-
-Follow the prompts to authenticate through your browser.
-
-### 3. Configure Your GitHub Username
-
-Your GitHub username will be used as your student identifier.
-
-**Windows PowerShell:**
-
-```powershell
-"GITHUB_USERNAME=$(gh api user --jq '.login')" | Set-Content .env
-```
-
-**macOS/Linux:**
-
-```bash
-echo "GITHUB_USERNAME=$(gh api user --jq '.login')" > .env
-```
-
-### 4. Start Docker
-
-Make sure Docker Desktop is running.
-
-```bash
-docker compose pull site
 docker compose up -d --build
 ```
 
-### 5. Open Meridian CleanRoom
+If port 8080 is already in use, start the site on another local port, for example `SITE_PORT=8081 docker compose up -d --build`.
+
+
+### 3. Open the site
 
 Visit:
-
 http://localhost:8080
 
-### 6. Open the Player Terminal
+This will bring you to the faux medical site, which you will attempt to login to. Use `http://localhost:8081` if you selected `SITE_PORT=8081`.
 
+### 4. Open the Player Terminal
+
+The player terminal provides a uniform environment for all of the players.
 ```bash
 docker compose exec player sh
 ```
-
-The player terminal provides `curl` and `jq` for interacting with the server.
+It provides `curl` (a program for sending HTTP(S) requests) and `jq` (a program for parsing JSON responses) for interacting with the server.
 
 ---
 
 ## Communicating with the Server
 
-Meridian CleanRoom provides an HTTP API.
+The Meridian CleanRoom website provides an HTTP API.
 
 Inside the player container, the server is available at:
 
 ```text
-http://site:8080
+http://localhost:8080
 ```
 
 You can use the `$SITE` environment variable instead of typing the full address.
@@ -91,8 +70,10 @@ You can use the `$SITE` environment variable instead of typing the full address.
 **Request a challenge:**
 
 ```bash
-curl -s "$SITE/stage/1/challenge" | jq
+curl -s "$SITE/stage/1/challenge?user=YOUR_NAME" | jq
 ```
+
+Choose a local name (letters, numbers, dots, underscores, and hyphens; up to 32 characters) and replace `YOUR_NAME`. The response includes the caller's local IP; the name and IP personalize flags for this run. If omitted, the user defaults to `student`.
 
 **Request an attestation quote:**
 
@@ -100,12 +81,12 @@ curl -s "$SITE/stage/1/challenge" | jq
 curl -s "$SITE/stage/1/quote?nonce=VALUE&workload=allowed" | jq
 ```
 
-Replace `VALUE` with the nonce provided by the server.
+Replace `VALUE` with the nonce provided by the server, and use the same `user` value when requesting a new challenge for each stage.
 
 **Save a response to a file:**
 
 ```bash
-curl -s "$SITE/stage/1/challenge" > challenge.json
+curl -s "$SITE/stage/1/challenge?user=YOUR_NAME" > challenge.json
 ```
 
 **Display saved JSON:**
@@ -123,12 +104,16 @@ jq -r '.nonce' challenge.json
 **Submit JSON to the server:**
 
 ```bash
-curl -s -X POST "$SITE/stage/1/verify" \
+USER=YOUR_NAME
+CHALLENGE=$(curl -fsS "$SITE/stage/1/challenge?user=$USER")
+NONCE=$(printf '%s' "$CHALLENGE" | jq -r '.nonce')
+QUOTE=$(curl -fsS "$SITE/stage/1/quote?nonce=$NONCE&workload=allowed")
+curl -fsS -X POST "$SITE/stage/1/verify" \
   -H "Content-Type: application/json" \
-  -d '{"key":"value"}' | jq
+  -d "$QUOTE" | jq
 ```
 
-Replace the sample JSON with the data required by the endpoint.
+Replace `YOUR_NAME` with your chosen local name. Each stage needs its own fresh challenge; the challenge response also shows the local IP used to personalize the flag.
 
 ### API Reference
 
@@ -185,7 +170,7 @@ CTF{stage3_...}
 CTF{stage4_...}
 ```
 
-Flags are personalized using your configured GitHub username.
+Flags are personalized using the user name you choose when requesting a challenge and the local IP address of the requesting client.
 
 Record the flags you obtain during the lab. These locally generated flags serve as challenge-completion indicators; your instructor will explain how submissions are assessed.
 
@@ -193,7 +178,7 @@ Record the flags you obtain during the lab. These locally generated flags serve 
 
 For each completed stage, submit:
 
-- Your GitHub username
+- Your chosen user name
 - Stage number
 - Captured flag
 - A brief explanation of your approach
@@ -230,34 +215,8 @@ docker compose up -d
 docker compose down
 ```
 
-**Check your GitHub login:**
-
-```bash
-gh auth status
-```
-
-**Check your configured username:**
-
-Windows PowerShell:
-
-```powershell
-Get-Content .env
-```
-
-macOS/Linux:
-
-```bash
-cat .env
-```
-
-If `gh` is not recognized after installation, close and reopen your terminal.
-
 ---
 
 ## Lab Rules
 
-This lab is intended for cybersecurity education.
-
-The environment uses simulated attestation and synthetic medical data.
-
-Perform testing only against the provided Meridian CleanRoom Docker environment. Do not attempt these techniques against systems without authorization.
+Any assistance you receive from any tool or other person should be included in your report to the instructor.
