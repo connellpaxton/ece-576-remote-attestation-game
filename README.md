@@ -23,7 +23,7 @@ The docker container packages all of the other dependencies in the project and e
 
 ```bash
 https://github.com/connellpaxton/ece-576-remote-attestation-game
-cd meridian-cleanroom-lab
+cd ece-576-remote-attestation-game
 ```
 
 ### 2. Start Docker
