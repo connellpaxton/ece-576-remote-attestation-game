@@ -117,17 +117,39 @@ Replace `YOUR_NAME` with your chosen local name. Each stage needs its own fresh 
 
 ### API Reference
 
-| Endpoint | Method | Description |
-|---|---|---|
-| `/stage/<stage>/challenge` | GET | Request a challenge nonce |
-| `/stage/<stage>/quote` | GET | Request an attestation quote |
-| `/stage/<stage>/verify` | POST | Submit an attestation quote |
-| `/captured-quote` | GET | Retrieve captured attestation evidence |
-| `/stage/4/firmware/status` | GET | View platform firmware status |
-| `/stage/4/firmware/archive` | GET | Examine archived firmware |
-| `/stage/4/firmware/install` | POST | Submit a firmware package |
+All stage routes use a stage number from `1` through `4`. The examples below assume the player container and its `$SITE` variable from the setup section.
 
-Some endpoints behave differently depending on the stage.
+| Endpoint | Method | Inputs | Successful response |
+|---|---|---|---|
+| `/` | GET | None | CleanRoom homepage and current policy information |
+| `/stage/<stage>/challenge` | GET | Optional `user` query parameter; defaults to `student` | JSON with `nonce`, `user`, and `local_ip` |
+| `/stage/<stage>/quote` | GET | Required `nonce`; optional `workload` (`allowed`, `modified`, or `unapproved`, default `allowed`) | Signed quote with `nonce`, `measurement`, `tcb_version`, and `signature` |
+| `/stage/<stage>/verify` | POST | JSON quote containing all four fields above | `status`, `reason`, and `clean_room`; a `flag` is included when that stage's objective is met |
+| `/captured-quote` | GET | None | A previously captured signed quote for Stage 2 |
+| `/stage/4/firmware/status` | GET | None | Current `installed_tcb` and policy `minimum_tcb` |
+| `/stage/4/firmware/archive` | GET | None | `packages` array; each package has integer `version` and `signature` |
+| `/stage/4/firmware/install` | POST | JSON firmware package with `version` and `signature` | Installed `tcb_version` |
+| `/clean-room` | GET | `token` query parameter from a successful verify response | Displays the session and synthetic cohort data |
+
+#### Parameters, validation, and responses
+
+- `user` must contain 1-32 letters, numbers, dots, underscores, or hyphens. An invalid value returns HTTP 400. The value and the caller's local IP are used to personalize the flag.
+- `nonce` is issued by the challenge endpoint as an eight-character hexadecimal string. The quote endpoint requires a non-empty nonce value but does not check it against the current challenge. Each stage has one current challenge, and verifying consumes it. Get a fresh challenge before each verification attempt.
+- `workload` selects a simulated measurement: `allowed` is the approved analytics workload, `modified` has the same first eight characters as the approved measurement, and `unapproved` is unrelated. Unknown values or a missing nonce return HTTP 400.
+- Stage 4 quotes use the currently installed TCB version. Quotes from Stages 1-3 use the simulated platform's TCB version.
+- Stage 2 deliberately disables `/stage/2/quote` and returns HTTP 403. Use `/captured-quote` instead.
+- The verify request must be JSON with `nonce`, `measurement`, `tcb_version`, and `signature`. A missing field or non-object body returns HTTP 400; no outstanding challenge returns HTTP 409; a rejected quote returns HTTP 403.
+- Firmware install expects a JSON object with an integer `version` and string `signature`. The version must be in the allowed set (3, 4, 5, 6, or 7), have a valid signature, and meet the updater minimum (6). A malformed package returns HTTP 400; an invalid signature or too-old package returns HTTP 403. The archive currently includes signed packages for versions 3, 4, 5, and 6.
+- `/clean-room` accepts an optional `token`. Without one it shows the token form; with an unknown token it shows an error message. A token from a successful verify response opens that session.
+
+#### Stage source files
+
+Each stage's supplied verifier is available as a standalone Python file. These are the implementations the server loads from `/student`; inspect the relevant stage file alongside the endpoint behavior above. They are challenge source, not a solution script.
+
+- [Stage 1 verifier](stage-reference/stage1.py)
+- [Stage 2 verifier](stage-reference/stage2.py)
+- [Stage 3 verifier](stage-reference/stage3.py)
+- [Stage 4 verifier](stage-reference/stage4.py)
 
 ---
 
