@@ -11,7 +11,7 @@ must also fully explain how you got to your solution, and provide a fix that wil
 
 Before starting, install:
 
-- [Docker Desktop](https://www.docker.com/products/docker-desktop/)
+- [Docker (With Compose), either the CLI or Desktop](https://www.docker.com/products/docker-desktop/)
 - [Git](https://git-scm.com/downloads)
 
 The docker container packages all of the other dependencies in the project and ensures a uniform starting point for all players.
