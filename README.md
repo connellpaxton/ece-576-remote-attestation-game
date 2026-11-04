@@ -22,8 +22,8 @@ The docker container packages all of the other dependencies in the project and e
 ### 1. Clone the Repository
 
 ```bash
-https://github.com/connellpaxton/ece-576-remote-attestation-game
-cd meridian-cleanroom-lab
+git clone https://github.com/connellpaxton/ece-576-remote-attestation-game
+cd ece-576-remote-attestation-game
 ```
 
 ### 2. Start Docker
@@ -63,7 +63,10 @@ Inside the player container, the server is available at:
 http://localhost:8080
 ```
 
-You can use the `$SITE` environment variable instead of typing the full address.
+But we can refer to it using the environment variable `$SITE`.
+
+_Note that if the variable is undefined (or you get no response from the following commands), you may have forgotten to enter the docker shell, or ran the commands from the wrong terminal._
+
 
 ### Basic Commands
 
