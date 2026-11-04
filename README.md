@@ -63,7 +63,11 @@ Inside the player container, the server is available at:
 http://localhost:8080
 ```
 
-You can use the `$SITE` environment variable instead of typing the full address.
+Here we set our `$SITE` environment variable to the full address for ease of reading and typing.
+```bash
+export SITE='http://localhost:8080'
+```
+
 
 ### Basic Commands
 
