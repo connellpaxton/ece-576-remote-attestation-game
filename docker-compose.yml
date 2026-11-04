@@ -1,0 +1,17 @@
+services:
+  site:
+    image: ghcr.io/tinacheng2/meridian-cleanroom-site:v1
+    environment:
+      GITHUB_USERNAME: ${GITHUB_USERNAME:?Set GitHub username first}
+      FLAG_SECRET: classroom-demo-v1
+    ports:
+      - "127.0.0.1:8080:8080"
+
+  player:
+    build: ./player
+    environment:
+      SITE: http://site:8080
+    depends_on:
+      - site
+    stdin_open: true
+    tty: true
