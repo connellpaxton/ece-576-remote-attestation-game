@@ -1,8 +1,8 @@
 services:
   site:
-    build:
-      context: ./priv/private_ece_576_group_project
-      dockerfile: site/Dockerfile
+    # The site source is intentionally private; use the public course image so
+    # a fresh clone remains runnable without access to that submodule.
+    image: ghcr.io/tinacheng2/meridian-cleanroom-site@sha256:6434402a3015a1a37a6d6499fc1f23b4587c3b139a4b4c004ed3c304106a2ded
     environment:
       FLAG_SECRET: classroom-demo-v1
     ports:
