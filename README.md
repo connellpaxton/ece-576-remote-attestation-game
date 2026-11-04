@@ -22,7 +22,7 @@ The docker container packages all of the other dependencies in the project and e
 ### 1. Clone the Repository
 
 ```bash
-https://github.com/connellpaxton/ece-576-remote-attestation-game
+git clone https://github.com/connellpaxton/ece-576-remote-attestation-game
 cd ece-576-remote-attestation-game
 ```
 
