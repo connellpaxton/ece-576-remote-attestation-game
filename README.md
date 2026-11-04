@@ -62,11 +62,9 @@ Inside the player container, the server is available at:
 ```text
 http://localhost:8080
 ```
+But we can refer to it using the environment variable `$SITE`.
 
-Here we set our `$SITE` environment variable to the full address for ease of reading and typing.
-```bash
-export SITE='http://localhost:8080'
-```
+_Note that if the variable is undefined (or you get no response from the following commands), you may have forgotten to enter the docker shell, or ran the commands from the wrong terminal._
 
 
 ### Basic Commands
